@@ -1,0 +1,233 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.5.2 Chrome/142.0.7444.265 Electron/39.6.1 Safari/537.36" version="29.5.2">
+  <diagram id="dwLpUuIymFPaNGThMCkn" name="Page-1">
+    <mxGraphModel dx="2508" dy="417" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="utilisateur" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#6c8ebf;" value="Utilisateur" vertex="1">
+          <mxGeometry height="260" width="240" x="560" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="u_attrs" parent="utilisateur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="- id : int&#xa;- nom : string&#xa;- prenom : string&#xa;- email : string&#xa;- motDePasse : string&#xa;- telephone : string&#xa;- photo : string&#xa;- statut : string&#xa;- dateInscription : DateTime" vertex="1">
+          <mxGeometry height="148" width="240" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="u_sep" parent="utilisateur" style="line;strokeColor=#6c8ebf;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="240" y="176" as="geometry" />
+        </mxCell>
+        <mxCell id="u_methods" parent="utilisateur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;rotatable=0;" value="+ seConnecter(role) : void&#xa;+ seDeconnecter() : void&#xa;+ hasRole(role) : bool&#xa;+ getProfilActif() : mixed&#xa;+ verifierMotDePasse(saisie) : bool&#xa;+ changerMotDePasse(nouveau) : void" vertex="1">
+          <mxGeometry height="76" width="240" y="184" as="geometry" />
+        </mxCell>
+        <mxCell id="timestampable" parent="1" style="swimlane;fontStyle=2;startSize=36;fillColor=#000000;strokeColor=#FFFFFF;fontColor=#333333;dashed=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="90" width="200" x="110" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="ts_attrs" parent="timestampable" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ createdAt : DateTime&#xa;+ updatedAt : DateTime" vertex="1">
+          <mxGeometry height="54" width="200" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="atvPvOeCRT4JBqfrfuJs-10" parent="timestampable" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Timestampable &amp;lt;&amp;lt;trait&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="60" y="6" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ts_user" edge="1" parent="1" source="timestampable" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="utilisateur">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="administrateur" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#666666;" value="Administrateur" vertex="1">
+          <mxGeometry height="240" width="230" x="1250" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_attrs" parent="administrateur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- nom : string&#xa;- email : string&#xa;- motDePasse : string" vertex="1">
+          <mxGeometry height="72" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_sep" parent="administrateur" style="line;strokeColor=#666666;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_methods" parent="administrateur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ validerConducteur(p) : void&#xa;+ rejeterConducteur(p) : void&#xa;+ suspendreUtilisateur(u) : void&#xa;+ supprimerUtilisateur(u) : void&#xa;+ gererSignalement(s) : void&#xa;+ getStatistiques() : array&#xa;+ verifierMotDePasse(s) : bool" vertex="1">
+          <mxGeometry height="132" width="230" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="profilConducteur" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#82b366;" value="ProfilConducteur" vertex="1">
+          <mxGeometry height="290" width="230" x="30" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="pc_attrs" parent="profilConducteur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- utilisateur_id : int&#xa;- numeroPermis : string&#xa;- statutValidation : StatutConducteur&#xa;- noteMoyenne : float&#xa;- dateValidation : DateTime" vertex="1">
+          <mxGeometry height="108" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="pc_sep" parent="profilConducteur" style="line;strokeColor=#82b366;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="pc_methods" parent="profilConducteur" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ publierTrajet(t) : void&#xa;+ accepterReservation(r) : void&#xa;+ refuserReservation(r) : void&#xa;+ cloturerTrajet(t) : void&#xa;+ getMesTrajets() : array&#xa;+ getReservationsRecues() : array&#xa;+ getNote() : float&#xa;+ getEvaluations() : array&#xa;+ estValide() : bool" vertex="1">
+          <mxGeometry height="146" width="230" y="144" as="geometry" />
+        </mxCell>
+        <mxCell id="profilPassager" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#d6b656;" value="ProfilPassager" vertex="1">
+          <mxGeometry height="230" width="230" x="1030" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="pp_attrs" parent="profilPassager" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- utilisateur_id : int&#xa;- noteMoyenne : float" vertex="1">
+          <mxGeometry height="60" width="230" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pp_sep" parent="profilPassager" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="88" as="geometry" />
+        </mxCell>
+        <mxCell id="pp_methods" parent="profilPassager" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ rechercherTrajet() : array&#xa;+ faireReservation(t) : void&#xa;+ annulerReservation(r) : void&#xa;+ evaluerConducteur(r) : void&#xa;+ getReservations() : array" vertex="1">
+          <mxGeometry height="134" width="230" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_pc" edge="1" parent="1" source="utilisateur" style="edgeStyle=orthogonalEdgeStyle;startArrow=ERmanyToOne;startFill=0;endArrow=none;" target="profilConducteur" value="0..1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_pp" edge="1" parent="1" source="utilisateur" style="edgeStyle=orthogonalEdgeStyle;startArrow=ERmanyToOne;startFill=0;endArrow=none;" target="profilPassager" value="0..1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="680" y="510" />
+              <mxPoint x="1050" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vehicule" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#82b366;" value="Vehicule" vertex="1">
+          <mxGeometry height="190" width="230" x="160" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="v_attrs" parent="vehicule" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- conducteur_id : int&#xa;- marque : string&#xa;- modele : string&#xa;- immatriculation : string&#xa;- nombrePlaces : int&#xa;- estActif : bool" vertex="1">
+          <mxGeometry height="124" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="v_sep" parent="vehicule" style="line;strokeColor=#82b366;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="152" as="geometry" />
+        </mxCell>
+        <mxCell id="v_methods" parent="vehicule" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ setActif() : void" vertex="1">
+          <mxGeometry height="30" width="230" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pc_v" edge="1" parent="1" source="profilConducteur" style="edgeStyle=orthogonalEdgeStyle;startArrow=ERmandOne;startFill=1;endArrow=open;endFill=0;" target="vehicule" value="1..2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="trajet" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#6c8ebf;" value="Trajet" vertex="1">
+          <mxGeometry height="280" width="230" x="560" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="t_attrs" parent="trajet" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- conducteur_id : int&#xa;- vehicule_id : int&#xa;- villeDepart : string&#xa;- villeArrivee : string&#xa;- pointsArret : array&#xa;- dateHeure : DateTime&#xa;- nbPlaces : int&#xa;- nbPlacesDisponibles : int&#xa;- prixParPlace : float&#xa;- statut : string" vertex="1">
+          <mxGeometry height="186" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="t_sep" parent="trajet" style="line;strokeColor=#6c8ebf;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="214" as="geometry" />
+        </mxCell>
+        <mxCell id="t_methods" parent="trajet" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ publier() : void&#xa;+ modifier() : void&#xa;+ annuler() : void&#xa;+ cloture() : void" vertex="1">
+          <mxGeometry height="58" width="230" y="222" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pc_t" edge="1" parent="1" source="profilConducteur" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="trajet" value="1..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_t_v" edge="1" parent="1" source="trajet" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="vehicule" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reservation" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#d6b656;" value="Reservation" vertex="1">
+          <mxGeometry height="260" width="230" x="530" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="r_attrs" parent="reservation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- trajet_id : int&#xa;- passager_id : int&#xa;- statut : StatutReservation&#xa;- nbPlacesReservees : int&#xa;- dateReservation : DateTime" vertex="1">
+          <mxGeometry height="108" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="r_sep" parent="reservation" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="r_methods" parent="reservation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ confirmer() : void&#xa;+ annuler() : void&#xa;+ terminer() : void&#xa;+ verifierConflits() : bool&#xa;+ historiser() : void" vertex="1">
+          <mxGeometry height="116" width="230" y="144" as="geometry" />
+        </mxCell>
+        <mxCell id="e_t_r" edge="1" parent="1" source="trajet" style="edgeStyle=orthogonalEdgeStyle;startArrow=ERmandOne;startFill=1;endArrow=open;endFill=0;" target="reservation" value="0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pp_r" edge="1" parent="1" source="profilPassager" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="reservation" value="0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="evaluation" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#d6b656;" value="Evaluation" vertex="1">
+          <mxGeometry height="210" width="230" x="1130" y="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_attrs" parent="evaluation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- reservation_id : int&#xa;- conducteur_id : int&#xa;- passager_id : int&#xa;- note : int&#xa;- commentaire : string&#xa;- dateEvaluation : DateTime" vertex="1">
+          <mxGeometry height="124" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_sep" parent="evaluation" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="152" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_methods" parent="evaluation" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ valider() : bool&#xa;+ getNote() : int&#xa;+ getCommentaire() : string" vertex="1">
+          <mxGeometry height="50" width="230" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r_ev" edge="1" parent="1" source="reservation" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="evaluation" value="0..1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ev_pc" edge="1" parent="1" source="evaluation" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;" target="profilConducteur" value="reçoit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="signalement" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#b85450;" value="Signalement" vertex="1">
+          <mxGeometry height="190" width="230" x="900" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="sig_attrs" parent="signalement" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="- id : int&#xa;- rapporteur_id : int&#xa;- signale_id : int&#xa;- description : string&#xa;- dateSignalement : DateTime&#xa;- statut : string" vertex="1">
+          <mxGeometry height="108" width="230" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="sig_sep" parent="signalement" style="line;strokeColor=#b85450;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="8" width="230" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="sig_methods" parent="signalement" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ traiter() : void&#xa;+ archiver() : void" vertex="1">
+          <mxGeometry height="46" width="230" y="144" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u_sig" edge="1" parent="1" source="utilisateur" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="signalement" value="0..*">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_adm_sig" edge="1" parent="1" source="administrateur" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="signalement" value="gère">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ei_pc" edge="1" parent="1" source="atvPvOeCRT4JBqfrfuJs-6" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=block;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="profilConducteur">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="145.00000000000045" y="1500" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="trajetRepo" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#666666;" value="TrajetRepository" vertex="1">
+          <mxGeometry height="80" width="210" x="380" y="1380" as="geometry" />
+        </mxCell>
+        <mxCell id="trajetRepo_m" parent="trajetRepo" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ findByVilleEtDate() : array&#xa;+ findByConducteur() : array" vertex="1">
+          <mxGeometry height="52" width="210" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="reservationRepo" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#666666;" value="ReservationRepository" vertex="1">
+          <mxGeometry height="80" width="220" x="380" y="1820" as="geometry" />
+        </mxCell>
+        <mxCell id="reservationRepo_m" parent="reservationRepo" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ findByPassager() : array&#xa;+ findByTrajet() : array" vertex="1">
+          <mxGeometry height="52" width="220" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="utilisateurRepo" parent="1" style="swimlane;fontStyle=1;startSize=28;fillColor=default;strokeColor=#666666;" value="UtilisateurRepository" vertex="1">
+          <mxGeometry height="80" width="220" x="1110" y="1530" as="geometry" />
+        </mxCell>
+        <mxCell id="utilisateurRepo_m" parent="utilisateurRepo" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;" value="+ findByEmail() : mixed&#xa;+ findAll() : array" vertex="1">
+          <mxGeometry height="52" width="220" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ri_tr" edge="1" parent="1" source="atvPvOeCRT4JBqfrfuJs-7" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=block;endFill=0;exitX=-0.011;exitY=0.569;exitDx=0;exitDy=0;exitPerimeter=0;" target="trajetRepo">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="1575.0000000000005" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ri_rr" edge="1" parent="1" source="atvPvOeCRT4JBqfrfuJs-7" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=block;endFill=0;exitX=-0.016;exitY=0.569;exitDx=0;exitDy=0;exitPerimeter=0;" target="reservationRepo">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="1575.0000000000005" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ri_ur" edge="1" parent="1" source="atvPvOeCRT4JBqfrfuJs-7" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=block;endFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="utilisateurRepo">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="1575.0000000000005" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="statutReservation" parent="1" style="swimlane;fontStyle=2;startSize=36;fillColor=default;strokeColor=#d6b656;dashed=1;" value="«enum»&#xa;StatutReservation" vertex="1">
+          <mxGeometry height="80" width="230" x="780" y="1380" as="geometry" />
+        </mxCell>
+        <mxCell id="sr_vals" parent="statutReservation" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;overflow=hidden;" value="EN_ATTENTE · CONFIRMEE · TERMINEE · ANNULEE" vertex="1">
+          <mxGeometry height="24" width="230" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sr_r" edge="1" parent="1" source="statutReservation" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="reservation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="statutConducteur" parent="1" style="swimlane;fontStyle=2;startSize=36;fillColor=default;strokeColor=#82b366;dashed=1;" value="«enum»&#xa;StatutConducteur" vertex="1">
+          <mxGeometry height="60" width="230" x="-130" y="1280" as="geometry" />
+        </mxCell>
+        <mxCell id="sc_vals" parent="statutConducteur" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;overflow=hidden;" value="EN_ATTENTE · VALIDE · REJETE" vertex="1">
+          <mxGeometry height="24" width="230" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="e_sc_pc" edge="1" parent="1" source="statutConducteur" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="profilConducteur">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="atvPvOeCRT4JBqfrfuJs-6" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;i&gt;&amp;lt;&amp;lt;Interface&amp;gt;&amp;gt;&lt;/i&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;i&gt;&lt;b&gt;EvaluabableInterface&lt;/b&gt;&lt;/i&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="140" width="190" x="50" y="1500" as="geometry" />
+        </mxCell>
+        <mxCell id="ei_methods" parent="1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;overflow=hidden;shadow=0;" value="+ getNote() : float&#xa;+ getEvaluations() : array" vertex="1">
+          <mxGeometry height="54" width="230" x="50" y="1560" as="geometry" />
+        </mxCell>
+        <mxCell id="atvPvOeCRT4JBqfrfuJs-7" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;i&gt;&amp;lt;&amp;lt;Interface&amp;gt;&amp;gt;&lt;/i&gt;&lt;br&gt;&lt;b&gt;RepositoryInterface&lt;/b&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:4px;&quot;&gt;&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;+ find(id) : mixed&lt;/span&gt;&lt;br style=&quot;padding: 0px; margin: 0px; text-wrap-mode: nowrap;&quot;&gt;&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;+ findAll() : array&lt;/span&gt;&lt;br style=&quot;padding: 0px; margin: 0px; text-wrap-mode: nowrap;&quot;&gt;&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;+ save(entity) : void&lt;/span&gt;&lt;br style=&quot;padding: 0px; margin: 0px; text-wrap-mode: nowrap;&quot;&gt;&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;+ delete(id) : void&lt;/span&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="140" width="190" x="670" y="1490" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
