@@ -1,12 +1,9 @@
 <?php
 
-/**
- * Configuration de la connexion base de données.
- */
 return [
-    'host'     => 'localhost',
-    'dbname'   => 'kaay_dem',
-    'user'     => 'root',
+    'host' => 'localhost',
+    'dbname' => 'Kaay_Dem',
+    'user' => 'root',
     'password' => '',
-    'charset'  => 'utf8mb4',
+    'charset' => 'utf8mb4',
 ];
