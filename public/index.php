@@ -17,7 +17,6 @@ declare(strict_types=1);
 
 // ── 1. Autoload ───────────────────────────────────────────────────────────────
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-
 // ── 2. Session ────────────────────────────────────────────────────────────────
 session_start();
 
