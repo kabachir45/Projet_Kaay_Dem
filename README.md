@@ -124,7 +124,7 @@ kaay-dem/
 
 ## Avancement de l'implémentation
 
-### ✅ Étape 1 — Fondations
+###  Étape 1 — Fondations
 
 Mise en place de l'autoload PSR-4 via Composer et des éléments transversaux :
 
@@ -137,7 +137,7 @@ Mise en place de l'autoload PSR-4 via Composer et des éléments transversaux :
 | `Enums/StatutReservation.php` | 4 statuts + méthode `peutTransitionnerVers()` pour valider les transitions |
 | `Enums/StatutConducteur.php` | 3 statuts + méthode `estAutorise()` pour contrôler la publication de trajets |
 
-### ✅ Étape 2 — Modèles
+###  Étape 2 — Modèles
 
 Implémentation des neuf classes métier :
 
@@ -153,15 +153,35 @@ Implémentation des neuf classes métier :
 | `Models/Evaluation.php` | Note validée entre 1 et 5 à la construction. Liée à une unique réservation TERMINEE. |
 | `Models/Signalement.php` | Vérifie à la construction que `rapporteurId !== signaleId`. `marquerTraite()` lève `\LogicException` si déjà traité. |
 
-### 🔲 Étape 3 — Repositories
+###  Étape 3 — Repositories
 
-`Database` (PDO singleton) · `UtilisateurRepository` · `TrajetRepository` · `ReservationRepository`
+Mise en place de la couche d'accès aux données via PDO :
 
-### 🔲 Étape 4 — Core
+| Fichier | Points clés |
+|---|---|
+| `Core/Database.php` | Singleton PDO — une seule connexion partagée sur toute la durée de la requête. `__clone()` et `__wakeup()` privés pour verrouiller le singleton. |
+| `config/database.php` | Configuration de la connexion (host, dbname, user, password). À ne pas versionner avec de vraies credentials. |
+| `Repositories/UtilisateurRepository.php` | CRUD complet + `findByEmail()` pour la connexion + `emailExiste()` pour l'inscription. Accès au hash `motDePasse` via `ReflectionProperty` pour préserver l'encapsulation. |
+| `Repositories/TrajetRepository.php` | CRUD complet + `rechercher()` (ville départ, arrivée, date) + `findByConducteur()`. Restauration de `annule` via réflexion à l'hydratation. |
+| `Repositories/ReservationRepository.php` | CRUD complet + `findByTrajet()` + `findByPassager()` + `existeDeja()` pour éviter les doublons. Restauration du `statut` via réflexion à l'hydratation. |
+
+**Note sur `ReflectionProperty`** : les champs `motDePasse`, `annule` et `statut` n'ont pas de setter public par choix de conception (encapsulation stricte). Les repositories utilisent `ReflectionProperty` pour accéder à ces champs lors de la persistance et de la reconstruction depuis la base de données, sans exposer de getter ou setter non souhaité.
+
+###  Étape 4 — Core en cours
 
 `Router` · `index.php`
 
 ---
+
+
+## Simplifications retenues
+
+Dans le cadre d'un projet académique, deux fonctionnalités ont été volontairement simplifiées :
+
+| Fonctionnalité | Approche retenue | Raison |
+|---|---|---|
+| Géolocalisation / Maps | Champs texte `ville_depart` et `ville_arrivee` | Une intégration Google Maps ou OpenStreetMap nécessiterait une clé API externe |
+| Paiement en ligne | Prix stocké en `float` sur le trajet, règlement en dehors de la plateforme | L'intégration d'un gateway (Stripe, PayPal) est hors scope d'un projet POO PHP |
 
 ## Technologies utilisées
 
