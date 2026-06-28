@@ -19,4 +19,8 @@ if (PHP_VERSION_ID < 50600) {
 
 require_once __DIR__ . '/composer/autoload_real.php';
 
+<<<<<<< HEAD
 return ComposerAutoloaderInit75c1e43265c6d0424cf557d0e0cf48bc::getLoader();
+=======
+return ComposerAutoloaderInite6e639fdbe81950f7c80ddbc9dc18761::getLoader();
+>>>>>>> 4a2385e (Ajout des controllers,vues et index)
