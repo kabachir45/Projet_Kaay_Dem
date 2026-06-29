@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Timestampable;
+use App\Exceptions\NoteInvalideException;
 
 /**
  * Classe Evaluation
@@ -64,7 +65,7 @@ class Evaluation
     private function validerNote(int $note): void
     {
         if ($note < 1 || $note > 5) {
-            throw new \InvalidArgumentException("La note doit être comprise entre 1 et 5. Reçu : {$note}");
+            throw new NoteInvalideException("La note doit être comprise entre 1 et 5. Reçu : {$note}");
         }
     }
 }

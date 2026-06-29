@@ -1,0 +1,15 @@
+# Dépendances installées par Composer (réinstallables via `composer install`)
+/vendor/
+
+# Configuration locale sensible (identifiants BDD)
+/config/database.php
+
+# Fichiers générés / système
+*.log
+.DS_Store
+Thumbs.db
+
+# Éditeurs / IDE
+.idea/
+.vscode/
+*.swp

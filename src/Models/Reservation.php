@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Timestampable;
 use App\Enums\StatutReservation;
+use App\Exceptions\TransitionInvalideException;
 
 /**
  * Classe Reservation
@@ -24,6 +25,7 @@ class Reservation
     private int $trajetId;
     private int $passagerId;
     private StatutReservation $statut;
+    private bool $paiementConfirme = false;
     private ?Evaluation $evaluation = null;
 
     public function __construct(int $trajetId, int $passagerId)
@@ -46,12 +48,12 @@ class Reservation
 
     /**
      * Applique une transition de statut en vérifiant sa validité.
-     * @throws \LogicException si la transition est interdite
+     * @throws TransitionInvalideException si la transition est interdite
      */
     private function transitionner(StatutReservation $cible): void
     {
         if (!$this->statut->peutTransitionnerVers($cible)) {
-            throw new \LogicException(
+            throw new TransitionInvalideException(
                 "Transition invalide : {$this->statut->label()} → {$cible->label()}"
             );
         }
@@ -75,6 +77,24 @@ class Reservation
     public function estTerminee(): bool
     {
         return $this->statut === StatutReservation::TERMINEE;
+    }
+
+    public function paiementConfirme(): bool
+    {
+        return $this->paiementConfirme;
+    }
+
+    /**
+     * Confirme le règlement (par le conducteur), uniquement après un trajet terminé.
+     * @throws TransitionInvalideException si la réservation n'est pas TERMINEE
+     */
+    public function confirmerPaiement(): void
+    {
+        if (!$this->estTerminee()) {
+            throw new TransitionInvalideException("Le paiement ne peut être confirmé qu'après un trajet terminé.");
+        }
+        $this->paiementConfirme = true;
+        $this->touch();
     }
 
 

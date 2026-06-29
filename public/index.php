@@ -1,78 +1,23 @@
 <?php
 
 /**
- * Point d'entrée unique de l'application Kaay Dem !
+ * NOTE D'ARCHITECTURE — point d'entrée et routage
+ * ------------------------------------------------
+ * Le module demande un « routeur maison ». La brique correspondante existe :
+ * App\Core\Router (src/Core/Router.php) implémente ce concept — table de routes
+ * (méthode HTTP + URL → "Controller@action"), extraction d'un paramètre
+ * numérique, et dispatch vers le contrôleur.
  *
- * Toutes les requêtes HTTP passent par ce fichier grâce à la
- * configuration du serveur web (voir .htaccess).
+ * Choix retenu pour la version rendue : l'application est servie « par pages ».
+ * Chaque vue de src/Views/ est un point d'entrée léger qui délègue toute la
+ * logique métier à un Contrôleur (App\Controllers\*), lequel s'appuie sur les
+ * Modèles et Repositories. La séparation MVC Vue → Contrôleur → Modèle est donc
+ * respectée ; seul le routage centralisé via ce front-contrôleur n'est pas
+ * activé. Voir la section « Choix d'architecture — routage » du README pour la
+ * justification détaillée.
  *
- * Ordre d'exécution :
- *   1. Autoload Composer (PSR-4)
- *   2. Démarrage de la session
- *   3. Déclaration des routes
- *   4. Dispatch → Controller → View
+ * Ce fichier redirige donc vers la page d'accueil réelle de l'application.
  */
 
-declare(strict_types=1);
-
-// ── 1. Autoload ───────────────────────────────────────────────────────────────
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-// ── 2. Session ────────────────────────────────────────────────────────────────
-session_start();
-
-// ── 3. Routes ─────────────────────────────────────────────────────────────────
-use App\Core\Router;
-
-$router = new Router();
-
-// --- Authentification ---------------------------------------------------------
-$router->get('/login',       'AuthController@showLogin');
-$router->post('/login',      'AuthController@login');
-$router->get('/logout',      'AuthController@logout');
-$router->get('/inscription', 'AuthController@showInscription');
-$router->post('/inscription','AuthController@inscription');
-
-// --- Accueil ------------------------------------------------------------------
-$router->get('/',            'HomeController@index');
-
-// --- Trajets ------------------------------------------------------------------
-$router->get('/trajets',          'TrajetController@index');    // liste + recherche
-$router->get('/trajets/nouveau',  'TrajetController@create');   // formulaire création
-$router->post('/trajets/nouveau', 'TrajetController@store');    // enregistrement
-$router->get('/trajets',          'TrajetController@show');     // détail d'un trajet (/trajets/42)
-$router->get('/trajets/mes',      'TrajetController@mesTrajets'); // trajets du conducteur connecté
-
-// --- Réservations -------------------------------------------------------------
-$router->post('/reservations',         'ReservationController@store');   // créer
-$router->post('/reservations/annuler', 'ReservationController@annuler'); // annuler (/reservations/annuler/42)
-$router->get('/reservations/mes',      'ReservationController@mesReservations');
-
-// --- Évaluations --------------------------------------------------------------
-$router->get('/evaluations/nouveau',   'EvaluationController@create');
-$router->post('/evaluations/nouveau',  'EvaluationController@store');
-
-// --- Signalements -------------------------------------------------------------
-$router->post('/signalements/nouveau', 'SignalementController@store');
-
-// --- Profil utilisateur -------------------------------------------------------
-$router->get('/profil',        'ProfilController@index');
-$router->post('/profil',       'ProfilController@update');
-$router->get('/devenir-conducteur',  'ProfilController@devenirConducteur');
-$router->post('/devenir-conducteur', 'ProfilController@soumettrePermis');
-
-// --- Administration -----------------------------------------------------------
-$router->get('/admin',                       'AdminController@dashboard');
-$router->get('/admin/conducteurs',           'AdminController@conducteurs');
-$router->post('/admin/conducteurs/valider',  'AdminController@validerConducteur');
-$router->post('/admin/conducteurs/rejeter',  'AdminController@rejeterConducteur');
-$router->get('/admin/signalements',          'AdminController@signalements');
-$router->post('/admin/signalements/traiter', 'AdminController@traiterSignalement');
-$router->post('/admin/bannir',               'AdminController@bannirUtilisateur');
-
-// ── 4. Dispatch ───────────────────────────────────────────────────────────────
-try {
-    $router->dispatch();
-} catch (\RuntimeException $e) {
-    http_response_code(500);
-    echo "<h1>Erreur interne</h1><p>" . htmlspecialchars($e->getMessage()) . "</p>";
-}
+header('Location: ../index.php');
+exit;

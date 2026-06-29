@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Core\Database;
 use App\Interfaces\RepositoryInterface;
 use App\Models\Utilisateur;
+use App\Models\Administrateur;
 
 /**
  * UtilisateurRepository
@@ -102,6 +103,72 @@ class UtilisateurRepository implements RepositoryInterface
         return (int) $stmt->fetchColumn() > 0;
     }
 
+    /**
+     * Indique si l'utilisateur est administrateur.
+     */
+    public function estAdmin(int $id): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT est_admin FROM utilisateurs WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    /**
+     * Indique si l'utilisateur existe et n'est pas administrateur
+     * (cible valide d'un signalement).
+     */
+    public function existeNonAdmin(int $id): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM utilisateurs WHERE id = :id AND est_admin = 0');
+        $stmt->execute([':id' => $id]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
+     * Liste les utilisateurs non-administrateurs (pour les listes déroulantes),
+     * en excluant éventuellement un id (typiquement l'utilisateur courant).
+     * @return array<int, array<string, mixed>>
+     */
+    public function listerNonAdmins(?int $exclureId = null): array
+    {
+        $sql    = 'SELECT id, nom, prenom FROM utilisateurs WHERE est_admin = 0';
+        $params = [];
+        if ($exclureId !== null) {
+            $sql .= ' AND id != :exclure';
+            $params[':exclure'] = $exclureId;
+        }
+        $sql .= ' ORDER BY prenom, nom';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Charge un administrateur (utilisateur avec est_admin = 1) sous forme de modèle.
+     * Retourne null si l'id ne correspond pas à un administrateur.
+     */
+    public function findAdministrateur(int $id): ?Administrateur
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM utilisateurs WHERE id = :id AND est_admin = 1 LIMIT 1'
+        );
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+
+        $admin = new Administrateur($row['nom'], $row['prenom'], $row['email'], 'placeholder');
+        $admin->setId((int) $row['id']);
+        $admin->setMotDePasseHash($row['mot_de_passe']);
+        $admin->setCreatedAt(new \DateTime($row['created_at']));
+        $admin->setUpdatedAt(new \DateTime($row['updated_at']));
+
+        return $admin;
+    }
+
     // ── Persistance interne ───────────────────────────────────────────────────
 
     private function insert(Utilisateur $utilisateur): void
@@ -129,6 +196,7 @@ class UtilisateurRepository implements RepositoryInterface
         );
 
         $params = $this->buildParams($utilisateur);
+        unset($params[':created']);   // created_at n'est pas modifié en UPDATE
         $params[':id'] = $utilisateur->getId();
         $stmt->execute($params);
     }

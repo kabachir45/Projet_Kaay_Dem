@@ -53,24 +53,36 @@ Notre choix s'est porté sur **Kaay Dem !** pour les raisons suivantes :
 Le modèle est constitué des principales classes suivantes :
 
 ```
-Utilisateur
-├── ProfilConducteur
-│   └── Vehicule
-├── ProfilPassager
-├── Trajet
-│   └── Reservation
-│       └── Evaluation
-├── Signalement
-└── Administrateur
+Personne (classe abstraite)
+├── Utilisateur
+│   ├── ProfilConducteur
+│   │   └── Vehicule
+│   ├── ProfilPassager
+│   └── Trajet
+│       └── Reservation
+│           └── Evaluation
+├── Administrateur
+└── Signalement
 ```
+
+`Utilisateur` et `Administrateur` **héritent** de la classe abstraite `Personne`
+(identité + gestion sécurisée du mot de passe), qui définit deux méthodes
+**polymorphes** : `getRole()` et `peutAdministrer()`. Le double rôle
+conducteur/passager, lui, est géré par **composition** (un `Utilisateur` agrège
+0..1 `ProfilConducteur` et 0..1 `ProfilPassager`).
 
 Le projet comprend également :
 
+- la classe abstraite `Personne` (héritage + polymorphisme) ;
 - le trait `Timestampable` ;
 - l'interface `RepositoryInterface` ;
 - l'interface `EvaluableInterface` ;
 - l'énumération `StatutReservation` ;
-- l'énumération `StatutConducteur`.
+- l'énumération `StatutConducteur` ;
+- une hiérarchie d'**exceptions personnalisées** sous `App\Exceptions`
+  (`KaayDemException` abstraite → `PlacesInsuffisantesException`,
+  `ReservationConflitException`, `TransitionInvalideException`,
+  `LimiteVehiculesException`, `NoteInvalideException`).
 
 ---
 
@@ -86,14 +98,48 @@ Le projet comprend également :
 
 ---
 
+## Choix d'architecture — routage et point d'entrée
+
+Le projet applique le patron **MVC** avec une séparation stricte des
+responsabilités :
+
+- **Vues** (`src/Views/`) : présentation uniquement. Elles ne contiennent aucune
+  requête SQL ni logique métier ; elles délèguent toute action à un contrôleur.
+- **Contrôleurs** (`src/Controllers/`) : orchestrent la logique métier, le
+  contrôle d'accès par rôle et la gestion des exceptions.
+- **Modèles + Repositories** (`src/Models/`, `src/Repositories/`) : entités
+  métier et accès aux données via PDO (requêtes préparées).
+
+**Sur le « routeur maison » et le point d'entrée unique.** La brique
+`App\Core\Router` (`src/Core/Router.php`) implémente un routeur maison (table de
+routes `méthode + URL → Controller@action`, extraction d'un paramètre numérique,
+dispatch). Nous avons toutefois choisi de **servir l'application « par pages »**
+plutôt que via un front-contrôleur unique :
+
+- chaque vue est un point d'entrée léger qui instancie le contrôleur adéquat ;
+- ce choix évite la réécriture d'URL (`.htaccess`/`mod_rewrite`) et garantit un
+  fonctionnement identique sur n'importe quelle installation XAMPP, ce qui
+  **fiabilise la démonstration** ;
+- la séparation MVC — l'objectif pédagogique réel — reste pleinement respectée :
+  aucune logique ni SQL dans les vues, tout passe par contrôleurs → modèles →
+  repositories.
+
+Le front-contrôleur `public/index.php` est donc neutralisé (il redirige vers la
+page d'accueil) ; la classe `Router` est conservée comme démonstration du
+concept. Faire transiter toutes les requêtes par `public/index.php` reste une
+évolution possible sans remettre en cause la couche métier.
+
+---
+
 ## Structure du projet
 
 ```
 kaay-dem/
+├── index.php                      # Page d'accueil (entrée de l'app, servie par pages)
 ├── public/
-│   └── index.php                  # Point d'entrée unique
+│   └── index.php                  # Front-contrôleur (démo du routeur, redirige vers l'app)
 ├── src/
-│   ├── Core/                      # Infrastructure (Router, Database)
+│   ├── Core/                      # Infrastructure (Router maison, Database)
 │   ├── Traits/
 │   │   └── Timestampable.php
 │   ├── Interfaces/
@@ -167,21 +213,44 @@ Mise en place de la couche d'accès aux données via PDO :
 
 **Note sur `ReflectionProperty`** : les champs `motDePasse`, `annule` et `statut` n'ont pas de setter public par choix de conception (encapsulation stricte). Les repositories utilisent `ReflectionProperty` pour accéder à ces champs lors de la persistance et de la reconstruction depuis la base de données, sans exposer de getter ou setter non souhaité.
 
-###  Étape 4 — Core en cours
+###  Étape 4 — Contrôleurs et flux MVC
 
-`Router` · `index.php`
+| Élément | Points clés |
+|---|---|
+| `Core/Router.php` · `public/index.php` | Routeur maison + point d'entrée unique (déclaration des routes). |
+| `Controllers/ReservationController.php` | **Flux de réservation câblé sur la couche objet** : les vues `reserver.php` (création) et `mes_reservations.php` (annulation avec restitution de la place) délèguent au contrôleur, qui orchestre `ProfilPassagerRepository`, `TrajetRepository` et `ReservationRepository`, manipule les modèles `Reservation`/`Trajet` et l'énum `StatutReservation`, le tout en transaction. Les erreurs métier remontent via les exceptions `App\Exceptions` et sont affichées proprement (message flash). |
+| `Controllers/TrajetController.php` | **Publication, recherche et édition** : `publier_trajet.php` (création, rôle vérifié → `ConducteurNonAutoriseException`), `rechercher_trajet.php` (recherche filtrée + paginée via `rechercheAvancee`), et `modifier_trajet.php` (édition réservée au conducteur, **bloquée si une réservation est confirmée** — cf. sujet — coordonnées préservées). Validation via `DonneesInvalidesException`, persistance via `TrajetRepository`. |
+| `Controllers/EvaluationController.php` | **Flux d'évaluation câblé sur la couche objet** : la vue `evaluer.php` délègue au contrôleur, qui vérifie via `EvaluationRepository` que la réservation est *terminée* et appartient bien au passager, construit le modèle `Evaluation` (validation de la note 1..5 → `NoteInvalideException`) et l'enregistre. |
+| `Controllers/AdminController.php` | **Modération câblée sur la couche objet** : la vue `admin.php` délègue ses actions (valider/refuser un conducteur, bannir, traiter un signalement, annuler un trajet) au contrôleur. Le contrôle d'accès est centralisé : l'admin est chargé comme un modèle `Administrateur` (sous-type polymorphe de `Personne`) et `peutAdministrer()` est vérifié (`AccesRefuseException` sinon). Les actions s'appuient sur les modèles `ProfilConducteur`, `Trajet`/`Reservation` (annulation en cascade) et `Signalement`. |
+| `Controllers/SignalementController.php` | **Dépôt de signalement câblé** : la vue `signaler.php` délègue au contrôleur, qui valide (pas d'auto-signalement, motif obligatoire, cible existante → `DonneesInvalidesException`), construit le modèle `Signalement` et l'enregistre via `SignalementRepository`. |
+| `Controllers/ConducteurController.php` | **Demande pour devenir conducteur câblée** : la vue `devenir_conducteur.php` délègue au contrôleur, qui crée le modèle `ProfilConducteur` (statut *en attente*) et, optionnellement, un premier `Vehicule` (règle « max 2 » via `LimiteVehiculesException`), en transaction (`ProfilConducteurRepository` + `VehiculeRepository`). |
+| `Controllers/ReservationController.php` *(côté conducteur)* | `mes_trajets.php` délègue aussi au contrôleur les actions du conducteur sur les réservations reçues : **confirmer**, **terminer**, **confirmer le paiement** (transitions du modèle `Reservation`), avec contrôle d'appartenance du trajet. L'**annulation d'un trajet** (cascade sur ses réservations) passe par `TrajetController::annulerParConducteur()`. |
+| `Controllers/UtilisateurController.php` | **Gestion du profil câblée** : `profil.php` délègue la mise à jour des informations et le **changement de mot de passe** (encapsulé dans `Utilisateur::changerMotDePasse()`, sans jamais exposer le hash). |
+
+> **Tous les flux passent désormais par l'architecture MVC** (vues →
+> contrôleurs → modèles → repositories). Les vues ne contiennent plus de SQL :
+> les mutations sont déléguées aux contrôleurs, et la lecture (recherche,
+> tableaux de bord) passe par des méthodes de repository.
+>
+> La **recherche** (`rechercher_trajet.php` → `TrajetController::rechercher()` →
+> `TrajetRepository::rechercheAvancee()`) gère les filtres **ville / date /
+> prix maximum / places minimum** et la **pagination**, comme demandé par le sujet.
 
 ---
 
 
 ## Simplifications retenues
 
-Dans le cadre d'un projet académique, deux fonctionnalités ont été volontairement simplifiées :
+Dans le cadre d'un projet académique, une fonctionnalité a été volontairement simplifiée :
 
 | Fonctionnalité | Approche retenue | Raison |
 |---|---|---|
-| Géolocalisation / Maps | Champs texte `ville_depart` et `ville_arrivee` | Une intégration Google Maps ou OpenStreetMap nécessiterait une clé API externe |
-| Paiement en ligne | Prix stocké en `float` sur le trajet, règlement en dehors de la plateforme | L'intégration d'un gateway (Stripe, PayPal) est hors scope d'un projet POO PHP |
+| Paiement en ligne | Prix stocké en `decimal` sur le trajet, règlement en dehors de la plateforme | L'intégration d'un gateway (Stripe, PayPal) est hors scope d'un projet POO PHP |
+
+> La **carte des trajets** (fonctionnalité bonus du sujet) a été implémentée avec
+> **Leaflet + OpenStreetMap** : les trajets disposant de coordonnées
+> (`lat_depart`/`lng_depart`/`lat_arrivee`/`lng_arrivee`, cf. `migration_coords.sql`)
+> sont affichés sur une carte interactive dans la recherche.
 
 ## Technologies utilisées
 

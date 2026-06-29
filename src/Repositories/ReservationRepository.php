@@ -110,6 +110,37 @@ class ReservationRepository implements RepositoryInterface
         return (int) $stmt->fetchColumn() > 0;
     }
 
+    /**
+     * Indique si le passager a déjà une réservation active sur un trajet dont
+     * le créneau horaire chevauche [$debut, $fin]. La durée d'un trajet est
+     * estimée via duree_min (60 min par défaut si inconnue).
+     *
+     * @param int $exclureTrajetId trajet à ignorer (celui qu'on est en train de réserver)
+     */
+    public function existeChevauchement(int $passagerId, \DateTime $debut, \DateTime $fin, int $exclureTrajetId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*)
+             FROM reservations r
+             JOIN trajets t ON t.id = r.trajet_id
+             WHERE r.passager_id = :passager
+               AND r.statut IN (:attente, :confirmee)
+               AND t.annule = 0
+               AND t.id <> :exclure
+               AND t.date_depart < :fin
+               AND DATE_ADD(t.date_depart, INTERVAL COALESCE(t.duree_min, 60) MINUTE) > :debut"
+        );
+        $stmt->execute([
+            ':passager'  => $passagerId,
+            ':attente'   => StatutReservation::EN_ATTENTE->value,
+            ':confirmee' => StatutReservation::CONFIRMEE->value,
+            ':exclure'   => $exclureTrajetId,
+            ':fin'       => $fin->format('Y-m-d H:i:s'),
+            ':debut'     => $debut->format('Y-m-d H:i:s'),
+        ]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
     private function insert(Reservation $reservation): void
     {
         $stmt = $this->pdo->prepare(
@@ -127,14 +158,15 @@ class ReservationRepository implements RepositoryInterface
 
         $stmt = $this->pdo->prepare(
             'UPDATE reservations
-             SET statut = :statut, updated_at = :updated
+             SET statut = :statut, paiement_confirme = :paiement, updated_at = :updated
              WHERE id = :id'
         );
 
         $stmt->execute([
-            ':statut'  => $reservation->getStatut()->value,
-            ':updated' => $reservation->getUpdatedAt()->format('Y-m-d H:i:s'),
-            ':id'      => $reservation->getId(),
+            ':statut'   => $reservation->getStatut()->value,
+            ':paiement' => $reservation->paiementConfirme() ? 1 : 0,
+            ':updated'  => $reservation->getUpdatedAt()->format('Y-m-d H:i:s'),
+            ':id'       => $reservation->getId(),
         ]);
     }
 
@@ -165,6 +197,12 @@ class ReservationRepository implements RepositoryInterface
         $ref    = new \ReflectionProperty(Reservation::class, 'statut');
         $ref->setAccessible(true);
         $ref->setValue($reservation, $statut);
+
+        if ((bool) ($row['paiement_confirme'] ?? false)) {
+            $refP = new \ReflectionProperty(Reservation::class, 'paiementConfirme');
+            $refP->setAccessible(true);
+            $refP->setValue($reservation, true);
+        }
 
         return $reservation;
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Timestampable;
 use App\Interfaces\EvaluableInterface;
 use App\Enums\StatutConducteur;
+use App\Exceptions\LimiteVehiculesException;
 
 /**
  * Classe ProfilConducteur
@@ -60,12 +61,12 @@ class ProfilConducteur implements EvaluableInterface
     public function getVehicules(): array { return $this->vehicules; }
 
     /**
-     * @throws \OverflowException si le conducteur possède déjà 2 véhicules
+     * @throws LimiteVehiculesException si le conducteur possède déjà 2 véhicules
      */
     public function ajouterVehicule(Vehicule $vehicule): void
     {
         if (count($this->vehicules) >= 2) {
-            throw new \OverflowException("Un conducteur ne peut pas posséder plus de 2 véhicules.");
+            throw new LimiteVehiculesException("Un conducteur ne peut pas posséder plus de 2 véhicules.");
         }
         $this->vehicules[] = $vehicule;
         $this->touch();

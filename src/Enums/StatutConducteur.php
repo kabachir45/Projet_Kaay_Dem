@@ -11,7 +11,7 @@ enum StatutConducteur: string
 {
     case EN_ATTENTE = 'EN_ATTENTE';
     case VALIDE     = 'VALIDE';
-    case REJETE     = 'REJETE';
+    case REFUSE     = 'REFUSE';
 
     /**
      * Retourne le libellé pour l'affichage dans les vues.
@@ -21,7 +21,7 @@ enum StatutConducteur: string
         return match($this) {
             self::EN_ATTENTE => 'En attente de validation',
             self::VALIDE     => 'Validé',
-            self::REJETE     => 'Rejeté',
+            self::REFUSE     => 'Refusé',
         };
     }
 

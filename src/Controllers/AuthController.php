@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Utilisateur;
 use App\Repositories\UtilisateurRepository;
+use App\Core\Database;
 
 class AuthController
 {
@@ -52,30 +53,36 @@ class AuthController
         $_SESSION['utilisateur_id'] = $utilisateur->getId();
         $_SESSION['nom'] = $utilisateur->getNomComplet();
 
+        // Stocker le flag admin en session
+        try {
+            $pdo = Database::getInstance()->getConnection();
+            $stmt = $pdo->prepare("SELECT est_admin FROM utilisateurs WHERE id = :id");
+            $stmt->execute([':id' => $utilisateur->getId()]);
+            $row = $stmt->fetch();
+            $_SESSION['est_admin'] = (bool)($row['est_admin'] ?? false);
+        } catch (\Exception $e) {
+            $_SESSION['est_admin'] = false;
+        }
+
         return true;
     }
 
     public function deconnecter(): void
-{
-    $_SESSION = [];
+    {
+        $_SESSION = [];
 
-    if (ini_get('session.use_cookies')) {
-        $params = session_get_cookie_params();
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(), '',
+                time() - 42000,
+                $params['path'], $params['domain'],
+                $params['secure'], $params['httponly']
+            );
+        }
 
-        setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params['path'],
-            $params['domain'],
-            $params['secure'],
-            $params['httponly']
-        );
+        session_destroy();
+        header("Location: /IAGEB/Projet_kay_dem/Projet_Kaay_Dem/index.php");
+        exit;
     }
-
-    session_destroy();
-
-    header("Location: /Projet_Kaay_Dem/index.php");
-    exit;
-}
 }

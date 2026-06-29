@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Timestampable;
+use App\Exceptions\PlacesInsuffisantesException;
 
 /**
  * Classe Trajet
@@ -19,7 +20,7 @@ class Trajet
 
     private ?int $id = null;
     private int $conducteurId;
-    private int $vehiculeId;
+    private ?int $vehiculeId;
     private string $villeDepart;
     private string $villeArrivee;
     private \DateTime $dateDepart;
@@ -27,12 +28,22 @@ class Trajet
     private int $placesDisponibles;
     private bool $annule = false;
 
+    // Champs optionnels (renseignés à la publication)
+    private ?string $pointsArret = null;
+    private ?string $description = null;
+    private ?float $latDepart   = null;
+    private ?float $lngDepart    = null;
+    private ?float $latArrivee   = null;
+    private ?float $lngArrivee    = null;
+    private ?float $distanceKm   = null;
+    private ?int   $dureeMin      = null;
+
     /** @var Reservation[] */
     private array $reservations = [];
 
     public function __construct(
         int       $conducteurId,
-        int       $vehiculeId,
+        ?int      $vehiculeId,
         string    $villeDepart,
         string    $villeArrivee,
         \DateTime $dateDepart,
@@ -54,7 +65,7 @@ class Trajet
     public function setId(int $id): void     { $this->id = $id; }
 
     public function getConducteurId(): int         { return $this->conducteurId; }
-    public function getVehiculeId(): int           { return $this->vehiculeId; }
+    public function getVehiculeId(): ?int          { return $this->vehiculeId; }
     public function getVilleDepart(): string       { return $this->villeDepart; }
     public function getVilleArrivee(): string      { return $this->villeArrivee; }
     public function getDateDepart(): \DateTime     { return $this->dateDepart; }
@@ -62,10 +73,38 @@ class Trajet
     public function getPlacesDisponibles(): int    { return $this->placesDisponibles; }
     public function estAnnule(): bool              { return $this->annule; }
 
+    public function getPointsArret(): ?string { return $this->pointsArret; }
+    public function getDescription(): ?string { return $this->description; }
+    public function getLatDepart(): ?float    { return $this->latDepart; }
+    public function getLngDepart(): ?float    { return $this->lngDepart; }
+    public function getLatArrivee(): ?float   { return $this->latArrivee; }
+    public function getLngArrivee(): ?float   { return $this->lngArrivee; }
+    public function getDistanceKm(): ?float   { return $this->distanceKm; }
+    public function getDureeMin(): ?int       { return $this->dureeMin; }
+
     public function setVilleDepart(string $v): void       { $this->villeDepart = $v; $this->touch(); }
     public function setVilleArrivee(string $v): void      { $this->villeArrivee = $v; $this->touch(); }
     public function setDateDepart(\DateTime $d): void     { $this->dateDepart = $d; $this->touch(); }
     public function setPrix(float $p): void               { $this->prix = $p; $this->touch(); }
+    public function setVehiculeId(?int $id): void         { $this->vehiculeId = $id; $this->touch(); }
+    public function setPointsArret(?string $p): void      { $this->pointsArret = $p; }
+    public function setDescription(?string $d): void      { $this->description = $d; }
+
+    /**
+     * Renseigne les coordonnées et l'itinéraire calculés (carte / OSRM).
+     */
+    public function setItineraire(
+        ?float $latDepart, ?float $lngDepart,
+        ?float $latArrivee, ?float $lngArrivee,
+        ?float $distanceKm, ?int $dureeMin
+    ): void {
+        $this->latDepart  = $latDepart;
+        $this->lngDepart  = $lngDepart;
+        $this->latArrivee = $latArrivee;
+        $this->lngArrivee = $lngArrivee;
+        $this->distanceKm = $distanceKm;
+        $this->dureeMin   = $dureeMin;
+    }
 
 
     public function aDesPlaces(): bool
@@ -75,12 +114,12 @@ class Trajet
 
     /**
      * Décrémente les places disponibles lors d'une confirmation de réservation.
-     * @throws \UnderflowException si plus de places disponibles
+     * @throws PlacesInsuffisantesException si plus de places disponibles
      */
     public function reserverPlace(): void
     {
         if (!$this->aDesPlaces()) {
-            throw new \UnderflowException("Plus de places disponibles sur ce trajet.");
+            throw new PlacesInsuffisantesException("Plus de places disponibles sur ce trajet.");
         }
         $this->placesDisponibles--;
         $this->touch();
