@@ -80,6 +80,8 @@ $viewsUrl = $base . 'src/Views/';
 .cta-banner h2{font-family:var(--font-head);font-size:clamp(28px,4vw,40px);font-weight:800;color:white;margin-bottom:16px}
 .cta-banner p{color:rgba(255,255,255,.8);font-size:18px;margin-bottom:36px}
 .cta-banner .cta-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+/* Mode nuit : --green-dark devient un vert clair → on garde un dégradé sombre pour rester lisible (texte blanc) */
+[data-theme="dark"] .cta-banner{background:linear-gradient(135deg,#065f46 0%,#053b2e 100%)}
 
 .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
 .testi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px}

@@ -172,6 +172,15 @@ tbody tr:last-child{border-bottom:none}
 [data-theme="dark"] .auth-right{background:#0f172a}
 [data-theme="dark"] .auth-form-title{color:#e2e8f0}
 
+/* Surfaces "marine" (fond = var(--navy)) : en mode nuit, --navy devient une
+   couleur de TEXTE claire. Sans ces surcharges, ces blocs deviendraient clairs
+   avec un texte blanc (illisible). On force donc un fond sombre explicite. */
+[data-theme="dark"] .hero{background:linear-gradient(135deg,#020617 0%,#0f172a 60%,#0f4c2a 100%)}
+[data-theme="dark"] .cities{background:#0f172a}
+[data-theme="dark"] footer{background:#020617}
+[data-theme="dark"] .btn-navy{background:#334155;color:#e2e8f0}
+[data-theme="dark"] .btn-navy:hover{background:#475569}
+
 /* Toggle bouton */
 .dark-toggle{
   background:none;border:1.5px solid var(--border);border-radius:20px;
