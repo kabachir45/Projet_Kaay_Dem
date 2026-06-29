@@ -148,7 +148,9 @@ kaay-dem/
 │   ├── Enums/
 │   │   ├── StatutReservation.php
 │   │   └── StatutConducteur.php
+│   ├── Exceptions/               # Hiérarchie d'exceptions métier (KaayDemException + filles)
 │   ├── Models/
+│   │   ├── Personne.php          # Classe abstraite (héritée par Utilisateur et Administrateur)
 │   │   ├── Utilisateur.php
 │   │   ├── ProfilConducteur.php
 │   │   ├── ProfilPassager.php
@@ -162,7 +164,8 @@ kaay-dem/
 │   ├── Controllers/
 │   └── Views/
 ├── config/
-│   └── database.php
+│   ├── database.example.php      # Modèle de config (à copier en database.php)
+│   └── database.php              # Config locale (non versionnée)
 └── composer.json
 ```
 
@@ -189,14 +192,15 @@ Implémentation des neuf classes métier :
 
 | Fichier | Points clés |
 |---|---|
-| `Models/Utilisateur.php` | Pas de `getMotDePasse()` — accès uniquement via `verifierMotDePasse()`. Méthodes `estConducteur()` / `estPassager()` pour la gestion des rôles. |
-| `Models/ProfilConducteur.php` | Implémente `EvaluableInterface`. `ajouterVehicule()` lève `\OverflowException` au-delà de 2 véhicules. `activerVehicule()` désactive automatiquement les autres. |
+| `Models/Personne.php` | **Classe abstraite** : identité (nom, prénom, email) + mot de passe haché. Méthodes abstraites **polymorphes** `getRole()` / `peutAdministrer()`. Pas de `getMotDePasse()` — accès uniquement via `verifierMotDePasse()`. |
+| `Models/Utilisateur.php` | **Hérite de `Personne`**. Cumule 0..1 `ProfilConducteur` et 0..1 `ProfilPassager` (composition). Méthodes `estConducteur()` / `estPassager()`. |
+| `Models/ProfilConducteur.php` | Implémente `EvaluableInterface`. `ajouterVehicule()` lève `LimiteVehiculesException` au-delà de 2 véhicules. `activerVehicule()` désactive automatiquement les autres. |
 | `Models/ProfilPassager.php` | Activable sans validation. Expose `getReservationsActives()` pour filtrer les réservations en cours. |
 | `Models/Vehicule.php` | Lié à un `ProfilConducteur`. Attribut `actif` géré exclusivement par `ProfilConducteur::activerVehicule()`. |
-| `Models/Administrateur.php` | Entité distincte d'`Utilisateur`. Expose `validerConducteur()`, `rejeterConducteur()`, `bannirUtilisateur()`. |
-| `Models/Trajet.php` | `annuler()` cascade l'annulation sur toutes les réservations actives. `reserverPlace()` lève `\UnderflowException` si plus de places. |
-| `Models/Reservation.php` | Toutes les transitions passent par `transitionner()` qui s'appuie sur `StatutReservation::peutTransitionnerVers()`. Toute transition invalide lève `\LogicException`. |
-| `Models/Evaluation.php` | Note validée entre 1 et 5 à la construction. Liée à une unique réservation TERMINEE. |
+| `Models/Administrateur.php` | **Hérite de `Personne`** (`getRole()` = « Administrateur », `peutAdministrer()` = `true`). Expose `validerConducteur()`, `rejeterConducteur()`, `bannirUtilisateur()`. |
+| `Models/Trajet.php` | `annuler()` cascade l'annulation sur toutes les réservations actives. `reserverPlace()` lève `PlacesInsuffisantesException` si plus de places. |
+| `Models/Reservation.php` | Transitions via `transitionner()` (`StatutReservation::peutTransitionnerVers()`) ; toute transition invalide lève `TransitionInvalideException`. Gère aussi `confirmerPaiement()` (après trajet terminé). |
+| `Models/Evaluation.php` | Note validée entre 1 et 5 à la construction (`NoteInvalideException` sinon). Liée à une unique réservation TERMINEE. |
 | `Models/Signalement.php` | Vérifie à la construction que `rapporteurId !== signaleId`. `marquerTraite()` lève `\LogicException` si déjà traité. |
 
 ###  Étape 3 — Repositories
@@ -206,18 +210,23 @@ Mise en place de la couche d'accès aux données via PDO :
 | Fichier | Points clés |
 |---|---|
 | `Core/Database.php` | Singleton PDO — une seule connexion partagée sur toute la durée de la requête. `__clone()` et `__wakeup()` privés pour verrouiller le singleton. |
-| `config/database.php` | Configuration de la connexion (host, dbname, user, password). À ne pas versionner avec de vraies credentials. |
-| `Repositories/UtilisateurRepository.php` | CRUD complet + `findByEmail()` pour la connexion + `emailExiste()` pour l'inscription. Accès au hash `motDePasse` via `ReflectionProperty` pour préserver l'encapsulation. |
-| `Repositories/TrajetRepository.php` | CRUD complet + `rechercher()` (ville départ, arrivée, date) + `findByConducteur()`. Restauration de `annule` via réflexion à l'hydratation. |
-| `Repositories/ReservationRepository.php` | CRUD complet + `findByTrajet()` + `findByPassager()` + `existeDeja()` pour éviter les doublons. Restauration du `statut` via réflexion à l'hydratation. |
+| `config/database.php` | Configuration de la connexion (non versionnée, cf. `.gitignore` ; un modèle `config/database.example.php` est fourni). |
+| `Repositories/UtilisateurRepository.php` | CRUD + `findByEmail()` / `emailExiste()` + `findAdministrateur()` / `estAdmin()`. Accès au hash `motDePasse` via `ReflectionProperty`. |
+| `Repositories/TrajetRepository.php` | CRUD + `rechercheAvancee()` (ville / date / prix max / places min + **pagination**) + `findByConducteur()`. |
+| `Repositories/ReservationRepository.php` | CRUD + `findByTrajet()` / `findByPassager()` + `existeDeja()` (doublon) + `existeChevauchement()` (conflit horaire). |
+| `Repositories/ProfilConducteurRepository.php` | Profil conducteur : recherche du profil validé, véhicules, création/validation. |
+| `Repositories/ProfilPassagerRepository.php` | Résolution / création à la volée du profil passager. |
+| `Repositories/VehiculeRepository.php` | Persistance des véhicules d'un conducteur. |
+| `Repositories/EvaluationRepository.php` | Vérifie qu'une réservation est évaluable et enregistre l'évaluation. |
+| `Repositories/SignalementRepository.php` | Dépôt et traitement des signalements. |
 
-**Note sur `ReflectionProperty`** : les champs `motDePasse`, `annule` et `statut` n'ont pas de setter public par choix de conception (encapsulation stricte). Les repositories utilisent `ReflectionProperty` pour accéder à ces champs lors de la persistance et de la reconstruction depuis la base de données, sans exposer de getter ou setter non souhaité.
+**Note sur `ReflectionProperty`** : certains champs (`motDePasse`, `annule`, `statut`, `paiementConfirme`, `traite`) n'ont pas de setter public par choix de conception (encapsulation stricte). Les repositories utilisent `ReflectionProperty` pour reconstruire ces champs depuis la base de données sans exposer de setter non souhaité.
 
 ###  Étape 4 — Contrôleurs et flux MVC
 
 | Élément | Points clés |
 |---|---|
-| `Core/Router.php` · `public/index.php` | Routeur maison + point d'entrée unique (déclaration des routes). |
+| `Core/Router.php` | Routeur maison fourni comme brique (table de routes, dispatch). Voir la section « Choix d'architecture — routage » : l'app est servie « par pages », chaque vue déléguant à un contrôleur. |
 | `Controllers/ReservationController.php` | **Flux de réservation câblé sur la couche objet** : les vues `reserver.php` (création) et `mes_reservations.php` (annulation avec restitution de la place) délèguent au contrôleur, qui orchestre `ProfilPassagerRepository`, `TrajetRepository` et `ReservationRepository`, manipule les modèles `Reservation`/`Trajet` et l'énum `StatutReservation`, le tout en transaction. Les erreurs métier remontent via les exceptions `App\Exceptions` et sont affichées proprement (message flash). |
 | `Controllers/TrajetController.php` | **Publication, recherche et édition** : `publier_trajet.php` (création, rôle vérifié → `ConducteurNonAutoriseException`), `rechercher_trajet.php` (recherche filtrée + paginée via `rechercheAvancee`), et `modifier_trajet.php` (édition réservée au conducteur, **bloquée si une réservation est confirmée** — cf. sujet — coordonnées préservées). Validation via `DonneesInvalidesException`, persistance via `TrajetRepository`. |
 | `Controllers/EvaluationController.php` | **Flux d'évaluation câblé sur la couche objet** : la vue `evaluer.php` délègue au contrôleur, qui vérifie via `EvaluationRepository` que la réservation est *terminée* et appartient bien au passager, construit le modèle `Evaluation` (validation de la note 1..5 → `NoteInvalideException`) et l'enregistre. |
