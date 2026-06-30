@@ -105,7 +105,7 @@ $trajetsJson = json_encode(array_values(array_map(fn($t) => [
 
 /* Cartes trajet */
 .trajet-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;transition:.25s;cursor:pointer}
-.trajet-card:hover,.trajet-card.highlighted{border-color:var(--green);box-shadow:0 4px 20px rgba(0,133,63,.15);transform:translateY(-2px)}
+.trajet-card:hover,.trajet-card.highlighted{border-color:var(--green);box-shadow:0 4px 20px rgba(21,208,224,.15);transform:translateY(-2px)}
 .trajet-card.highlighted{background:var(--green-light)}
 .trajet-route{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .trajet-city{font-family:var(--font-head);font-weight:800;font-size:16px;color:var(--navy)}
@@ -120,7 +120,7 @@ $trajetsJson = json_encode(array_values(array_map(fn($t) => [
 .trajet-price{font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--green);text-align:right}
 .trajet-price small{display:block;font-size:11px;color:var(--muted);font-weight:400}
 
-.login-prompt{background:var(--green-light);border:1px solid rgba(0,133,63,.2);border-radius:var(--radius);padding:14px 18px;text-align:center;margin-bottom:18px;color:var(--green-dark);font-size:14px}
+.login-prompt{background:var(--green-light);border:1px solid rgba(21,208,224,.2);border-radius:var(--radius);padding:14px 18px;text-align:center;margin-bottom:18px;color:var(--green-dark);font-size:14px}
 .login-prompt a{font-weight:700;color:var(--green-dark);text-decoration:underline}
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty-state div{font-size:48px;margin-bottom:12px}
@@ -139,7 +139,8 @@ $trajetsJson = json_encode(array_values(array_map(fn($t) => [
 .popup-route{font-family:var(--font-head);font-weight:800;font-size:15px;color:var(--navy);margin-bottom:8px}
 .popup-meta{color:var(--slate);font-size:13px;line-height:1.8}
 .popup-price{font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--green);margin:8px 0}
-.popup-btn{display:block;text-align:center;padding:8px;background:var(--green);color:white;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;margin-top:8px}
+.leaflet-popup-content a.popup-btn{display:block;text-align:center;padding:9px;background:var(--grad-green, #00853F);color:#fff !important;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;margin-top:8px;box-shadow:0 4px 12px -4px rgba(21,208,224,.5);transition:filter .15s ease}
+.leaflet-popup-content a.popup-btn:hover{filter:brightness(1.08)}
 
 @media(max-width:900px){
   .results-layout{grid-template-columns:1fr}

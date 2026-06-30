@@ -350,7 +350,7 @@ tbody tr:last-child{border-bottom:none}
 [data-theme="dark"] .section-card-title{color:#e2e8f0}
 [data-theme="dark"] thead{background:#020617}
 [data-theme="dark"] tbody tr{border-color:#2d3748;color:#94a3b8}
-[data-theme="dark"] tbody tr:hover{background:rgba(0,133,63,.08)}
+[data-theme="dark"] tbody tr:hover{background:rgba(21,208,224,.08)}
 [data-theme="dark"] .mois-bar{border-color:#2d3748}
 [data-theme="dark"] .mois-bar-label,[data-theme="dark"] .mois-bar-num{color:#94a3b8}
 [data-theme="dark"] .top-conducteur{border-color:#2d3748}

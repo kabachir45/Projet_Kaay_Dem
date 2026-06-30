@@ -63,7 +63,7 @@ function toggleTheme(){
 }
 // Mettre à jour le label au chargement
 document.addEventListener("DOMContentLoaded", function(){
-  const t = localStorage.getItem("kaaydem_theme") || "light";
+  const t = localStorage.getItem("kaaydem_theme") || "dark";
   const btn = document.getElementById("themeBtn");
   if(btn) btn.textContent = t === "dark" ? "☀️ Jour" : "🌙 Nuit";
 });

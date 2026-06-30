@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$profilExistant) {
           </div>
         </div>
 
-        <div style="background:var(--green-light);border:1px solid rgba(0,133,63,.2);border-radius:var(--radius-sm);padding:14px;margin-bottom:20px;font-size:14px;color:var(--green-dark)">
+        <div style="background:var(--green-light);border:1px solid rgba(21,208,224,.2);border-radius:var(--radius-sm);padding:14px;margin-bottom:20px;font-size:14px;color:var(--green-dark)">
           ℹ️ Votre demande sera examinée par un administrateur. Vous recevrez une confirmation dès validation.
         </div>
         <button type="submit" class="btn btn-green btn-lg" style="width:100%;justify-content:center">

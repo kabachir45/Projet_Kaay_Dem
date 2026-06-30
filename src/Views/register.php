@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <?php include __DIR__ . '/_style.php'; ?>
 <style>
 .auth-layout{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
-.auth-left{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#0f4c2a 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 48px;color:white}
+.auth-left{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#0c2b33 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 48px;color:white}
 .auth-left-logo{font-family:var(--font-head);font-size:32px;font-weight:800;margin-bottom:40px}
 .auth-left-logo em{font-style:normal;color:var(--gold)}
 .benefit{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px}

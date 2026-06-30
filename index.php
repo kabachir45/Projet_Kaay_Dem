@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 session_start();
+// Évite que le navigateur serve une version en cache (utile en dev et pour la démo)
+header('Cache-Control: no-store, must-revalidate');
 $isLoggedIn = isset($_SESSION['utilisateur_id']);
 $userNom = $_SESSION['nom'] ?? '';
 $activePage = 'accueil';
@@ -19,7 +21,7 @@ $viewsUrl = $base . 'src/Views/';
 <?php include __DIR__ . '/src/Views/_style.php'; ?>
 <style>
 .hero{
-  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#0f4c2a 100%);
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#0c2b33 100%);
   color:white;position:relative;overflow:hidden;
   padding:90px 24px 80px;
 }
@@ -31,18 +33,23 @@ $viewsUrl = $base . 'src/Views/';
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:24px;backdrop-filter:blur(4px)}
 .hero-badge span{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.hero h1{font-family:var(--font-head);font-size:clamp(36px,5vw,56px);font-weight:800;line-height:1.1;margin-bottom:20px}
-.hero h1 em{font-style:normal;color:var(--gold)}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero-content{animation:fadeUp .7s var(--ease, ease) both}
+.hero-img-area{animation:fadeUp .7s .15s var(--ease, ease) both}
+.hero h1{font-family:var(--font-head);font-size:clamp(36px,5vw,56px);font-weight:800;line-height:1.1;margin-bottom:20px;color:#42e7f2;text-shadow:0 0 30px rgba(21,208,224,.45)}
+.hero h1 em{font-style:normal;background:var(--grad-gold,linear-gradient(135deg,#ffd84d,#f6b73c));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ffd84d}
 .hero p{font-size:18px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:36px;max-width:480px}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
 .hero-img-area{display:flex;justify-content:center;align-items:center}
-.hero-card-demo{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:28px;backdrop-filter:blur(8px);width:100%;max-width:340px}
+.hero-card-demo{background:rgba(255,255,255,.06);border:1.5px solid rgba(21,208,224,.55);border-radius:20px;padding:28px;backdrop-filter:blur(8px);width:100%;max-width:340px;box-shadow:0 0 0 1px rgba(21,208,224,.2),0 0 55px -6px rgba(21,208,224,.5),0 30px 60px -20px rgba(0,0,0,.5);animation:floaty 6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.hero-card-demo,.hero-content,.hero-img-area{animation:none}}
 .hcd-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
 .hcd-route{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .hcd-city{font-weight:700;font-size:16px}
 .hcd-arrow{color:var(--gold);font-size:20px}
 .hcd-meta{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.hcd-chip{background:rgba(255,255,255,.1);padding:5px 12px;border-radius:20px;font-size:13px}
+.hcd-chip{background:rgba(21,208,224,.08);border:1px solid rgba(21,208,224,.45);color:#a6f0fb;padding:5px 12px;border-radius:20px;font-size:13px}
 .hcd-driver{display:flex;align-items:center;gap:10px}
 .hcd-avatar{width:36px;height:36px;background:var(--green);border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px}
 .hcd-rating{color:var(--gold);font-size:14px;font-weight:600}
@@ -56,14 +63,14 @@ $viewsUrl = $base . 'src/Views/';
 
 .section{padding:72px 24px}
 .section-inner{max-width:1100px;margin:0 auto}
-.section-tag{display:inline-block;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:16px}
+.section-tag{display:inline-block;background:var(--grad-green);color:var(--on-brand);font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:6px 14px;border-radius:20px;margin-bottom:16px;box-shadow:0 8px 18px -8px rgba(21,208,224,.55)}
 .section-title{font-family:var(--font-head);font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--navy);margin-bottom:16px;line-height:1.2}
 .section-sub{font-size:17px;color:var(--muted);max-width:540px;line-height:1.7}
 
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
 .step{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:32px 28px;position:relative;transition:.3s}
 .step:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--green)}
-.step-num{width:44px;height:44px;background:var(--green);color:white;border-radius:12px;display:grid;place-items:center;font-family:var(--font-head);font-weight:800;font-size:18px;margin-bottom:20px}
+.step-num{width:44px;height:44px;background:var(--grad-green);color:var(--on-brand);border-radius:12px;display:grid;place-items:center;font-family:var(--font-head);font-weight:800;font-size:18px;margin-bottom:20px;box-shadow:0 8px 18px -8px rgba(21,208,224,.5)}
 .step h3{font-family:var(--font-head);font-size:19px;font-weight:700;margin-bottom:10px;color:var(--navy)}
 .step p{color:var(--muted);font-size:15px;line-height:1.6}
 .step-icon{font-size:28px;margin-bottom:14px}
@@ -76,12 +83,12 @@ $viewsUrl = $base . 'src/Views/';
 .city-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:10px 22px;border-radius:50px;color:white;font-weight:600;font-size:15px;transition:.2s}
 .city-pill:hover{background:var(--green);border-color:var(--green)}
 
-.cta-banner{background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);padding:72px 24px;text-align:center}
+.cta-banner{background:linear-gradient(135deg,#0c2b33 0%,#06222a 100%);padding:72px 24px;text-align:center}
 .cta-banner h2{font-family:var(--font-head);font-size:clamp(28px,4vw,40px);font-weight:800;color:white;margin-bottom:16px}
 .cta-banner p{color:rgba(255,255,255,.8);font-size:18px;margin-bottom:36px}
 .cta-banner .cta-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
-/* Mode nuit : --green-dark devient un vert clair → on garde un dégradé sombre pour rester lisible (texte blanc) */
-[data-theme="dark"] .cta-banner{background:linear-gradient(135deg,#065f46 0%,#053b2e 100%)}
+/* Mode nuit : on garde un dégradé sombre pour rester lisible (texte blanc) */
+[data-theme="dark"] .cta-banner{background:linear-gradient(135deg,#0c2b33 0%,#06222a 100%)}
 
 .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
 .testi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
@@ -303,10 +310,10 @@ include __DIR__ . '/src/Views/_nav.php';
   <p>Créez votre compte gratuitement et trouvez votre prochain trajet en quelques secondes.</p>
   <div class="cta-btns">
     <?php if($isLoggedIn): ?>
-      <a href="<?= $viewsUrl ?>rechercher_trajet.php" class="btn btn-lg btn-navy">🔍 Rechercher un trajet</a>
+      <a href="<?= $viewsUrl ?>rechercher_trajet.php" class="btn btn-lg btn-green">🔍 Rechercher un trajet</a>
       <a href="<?= $viewsUrl ?>publier_trajet.php" class="btn btn-lg btn-outline">🚘 Publier un trajet</a>
     <?php else: ?>
-      <a href="<?= $viewsUrl ?>register.php" class="btn btn-lg btn-navy">Créer un compte gratuit</a>
+      <a href="<?= $viewsUrl ?>register.php" class="btn btn-lg btn-green">Créer un compte gratuit</a>
       <a href="<?= $viewsUrl ?>login.php" class="btn btn-lg btn-outline">Se connecter</a>
     <?php endif; ?>
   </div>

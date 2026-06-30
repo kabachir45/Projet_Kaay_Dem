@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conducteurId) {
 #map-preview{height:320px;border-radius:var(--radius);border:1.5px solid var(--border);margin-top:8px;display:none;position:relative;z-index:0}
 .map-loading{display:none;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-top:8px}
 .map-loading.show{display:flex}
-.route-info{display:none;background:var(--green-light);border:1px solid rgba(0,133,63,.2);border-radius:var(--radius-sm);padding:12px 16px;margin-top:8px;font-size:14px;color:var(--green-dark);font-weight:600;gap:20px}
+.route-info{display:none;background:var(--green-light);border:1px solid rgba(21,208,224,.2);border-radius:var(--radius-sm);padding:12px 16px;margin-top:8px;font-size:14px;color:var(--green-dark);font-weight:600;gap:20px}
 .route-info.show{display:flex;align-items:center;flex-wrap:wrap}
 .autocomplete-wrap{position:relative}
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--green);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);z-index:1000;max-height:200px;overflow-y:auto;box-shadow:var(--shadow)}
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conducteurId) {
 .autocomplete-list div:last-child{border-bottom:none}
 [data-theme="dark"] .autocomplete-list{background:#1e293b;border-color:var(--green)}
 [data-theme="dark"] .autocomplete-list div{color:#e2e8f0;border-color:#2d3748}
-[data-theme="dark"] .autocomplete-list div:hover{background:rgba(0,133,63,.2)}
+[data-theme="dark"] .autocomplete-list div:hover{background:rgba(21,208,224,.2)}
 </style>
 </head>
 <body>
